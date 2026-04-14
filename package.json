@@ -4,9 +4,6 @@
   "description": "DHF Agent RPA 自动化技能包 - 按需安装",
   "private": false,
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "install": "node scripts/install.js",
     "install:batch": "node scripts/install.js --batch",
