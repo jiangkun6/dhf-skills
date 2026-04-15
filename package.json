@@ -1,10 +1,14 @@
 {
-  "name": "@zx1998/dhf-rpa-installer",
+  "name": "@dhf-skill/dhf-skills",
   "version": "1.0.0",
   "description": "DHF Agent RPA 自动化技能包 - 按需安装",
   "private": false,
   "type": "module",
+  "bin": {
+    "dhf-skills": "./bin/dhf-skills.js"
+  },
   "scripts": {
+    "postinstall": "node scripts/install.js --check",
     "install": "node scripts/install.js",
     "install:batch": "node scripts/install.js --batch",
     "uninstall": "node scripts/uninstall.js",
@@ -24,24 +28,28 @@
     "rpa",
     "automation",
     "claude-code",
+    "claude",
     "skills",
     "browser",
     "web",
-    "workflow"
+    "workflow",
+    "ai",
+    "search",
+    "mail"
   ],
   "author": {
-    "name": "zx1998",
-    "email": "zxtest7985@163.com"
+    "name": "jiangkun6",
+    "email": "919606954@qq.com"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/dhf-rpa-skills.git"
+    "url": "https://github.com/jiangkun6/dhf-skills.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/dhf-rpa-skills/issues"
+    "url": "https://github.com/jiangkun6/dhf-skills/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/dhf-rpa-skills#readme",
+  "homepage": "https://github.com/jiangkun6/dhf-skills#readme",
   "dependencies": {
     "inquirer": "^9.2.0",
     "chalk": "^5.3.0",

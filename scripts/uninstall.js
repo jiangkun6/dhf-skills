@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
  * DHF RPA Skills 卸载脚本
+ *
+ * 支持命令行参数和交互式卸载
  */
 
 import inquirer from 'inquirer';
@@ -11,40 +13,84 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 技能注册表（与 install.js 保持一致）
-const SKILLS_REGISTRY = [
-  {
-    id: 'dhf-rpa-test-workflow',
-    name: 'RPA 测试工作流',
-    description: '测试 DHF Agent 基础连接和 RPA 操作',
-    category: '测试'
-  },
-  {
-    id: 'dhf-rpa-163mail-task',
-    name: '163 邮件发送',
-    description: '自动化发送 163 邮件',
-    category: '邮件'
-  },
-  {
-    id: 'dhf-rpa-outlook-mail-task',
-    name: 'Outlook 邮件发送',
-    description: '自动化发送 Outlook 邮件',
-    category: '邮件'
-  },
-  {
-    id: 'dhf-rpa-qq-mail-task',
-    name: 'QQ 邮件发送',
-    description: '自动化发送 QQ 邮件',
-    category: '邮件'
+// 加载 skills.json 配置
+function loadSkillsConfig() {
+  const configPath = path.join(__dirname, '..', 'skills.json');
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    return Object.values(config.skills);
+  } catch (error) {
+    return [];
   }
-];
+}
+
+// 短名称映射（与 install.js 保持一致）
+const SHORT_NAME_MAP = {
+  'test': 'dhf-rpa-test-workflow',
+  'test-workflow': 'dhf-rpa-test-workflow',
+  'qq': 'dhf-rpa-qq-mail-task',
+  'qq-mail': 'dhf-rpa-qq-mail-task',
+  'qq-mail-task': 'dhf-rpa-qq-mail-task',
+  'outlook': 'dhf-rpa-outlook-mail-task',
+  'outlook-mail': 'dhf-rpa-outlook-mail-task',
+  'outlook-mail-task': 'dhf-rpa-outlook-mail-task',
+  '163': 'dhf-rpa-163mail-task',
+  '163-mail': 'dhf-rpa-163mail-task',
+  'mail-163': 'dhf-rpa-163mail-task',
+  'mail-163-task': 'dhf-rpa-163mail-task',
+  'google': 'google-search-task',
+  'google-search': 'google-search-task',
+  'google-search-task': 'google-search-task',
+  'bing': 'bing-search-task',
+  'bing-search': 'bing-search-task',
+  'bing-search-task': 'bing-search-task',
+  'duckduckgo': 'duckduckgo-search-task',
+  'ddg': 'duckduckgo-search-task',
+  'naver': 'naver-search-task',
+  'naver-search': 'naver-search-task',
+  'naver-search-task': 'naver-search-task',
+  'sogou': 'sogou-wechat-search-task',
+  'sogou-wechat': 'sogou-wechat-search-task',
+  'sogou-wechat-search': 'sogou-wechat-search-task',
+  'wechat': 'sogou-wechat-search-task',
+  'yahoo-japan': 'yahoo-japan-search-task',
+  'yahoo-jp': 'yahoo-japan-search-task',
+  'chatgpt': 'chatgpt-ai-task',
+  'chatgpt-ai': 'chatgpt-ai-task',
+  'chatgpt-ai-task': 'chatgpt-ai-task',
+  'claude': 'claude-ai-task',
+  'claude-ai': 'claude-ai-task',
+  'claude-ai-task': 'claude-ai-task',
+  'deepseek': 'deepseek-ai-task',
+  'deepseek-ai': 'deepseek-ai-task',
+  'deepseek-ai-task': 'deepseek-ai-task',
+  'gemini': 'gemini-ai-task',
+  'gemini-ai': 'gemini-ai-task',
+  'gemini-ai-task': 'gemini-ai-task',
+  'kimi': 'kimi-ai-task',
+  'kimi-ai': 'kimi-ai-task',
+  'kimi-ai-task': 'kimi-ai-task',
+  'qwen': 'qwen-ai-task',
+  'qwen-ai': 'qwen-ai-task',
+  'qwen-ai-task': 'qwen-ai-task'
+};
+
+function resolveSkillName(name) {
+  const SKILLS_REGISTRY = loadSkillsConfig();
+  if (SKILLS_REGISTRY.find(s => s.id === name)) {
+    return name;
+  }
+  return SHORT_NAME_MAP[name] || name;
+}
 
 class SkillUninstaller {
-  constructor() {
+  constructor(args = []) {
+    this.args = args;
     this.repoRoot = path.join(__dirname, '..');
     this.claudeSkillsDir = this.getClaudeSkillsDir();
     this.pluginDir = path.join(this.repoRoot, '.claude-plugin');
     this.marketplaceFile = path.join(this.pluginDir, 'marketplace.json');
+    this.SKILLS_REGISTRY = loadSkillsConfig();
   }
 
   getClaudeSkillsDir() {
@@ -80,7 +126,7 @@ class SkillUninstaller {
       return [];
     }
 
-    const skills = SKILLS_REGISTRY.filter(s => installed.includes(s.id));
+    const skills = this.SKILLS_REGISTRY.filter(s => installed.includes(s.id));
 
     const choices = skills.map(skill => ({
       name: `🗑️  ${skill.name} - ${skill.description}`,
@@ -102,7 +148,7 @@ class SkillUninstaller {
   }
 
   async confirmUninstallation(selectedSkills) {
-    const skills = SKILLS_REGISTRY.filter(s => selectedSkills.includes(s.id));
+    const skills = this.SKILLS_REGISTRY.filter(s => selectedSkills.includes(s.id));
 
     console.log('\n📋 即将卸载以下技能:\n');
     skills.forEach(skill => {
@@ -145,7 +191,6 @@ class SkillUninstaller {
 
   updateMarketplace(remainingSkills) {
     if (remainingSkills.length === 0) {
-      // 没有剩余技能，删除 marketplace.json
       if (fs.existsSync(this.marketplaceFile)) {
         fs.unlinkSync(this.marketplaceFile);
       }
@@ -176,19 +221,98 @@ class SkillUninstaller {
     fs.writeFileSync(this.marketplaceFile, JSON.stringify(marketplace, null, 2));
   }
 
+  parseArgs() {
+    const skillNames = [];
+    const options = {
+      all: false,
+      interactive: false
+    };
+
+    for (const arg of this.args) {
+      if (arg === '--all' || arg === '-a') {
+        options.all = true;
+      } else if (arg === '--interactive' || arg === '-i') {
+        options.interactive = true;
+      } else if (!arg.startsWith('--')) {
+        skillNames.push(arg);
+      }
+    }
+
+    return { skillNames, options };
+  }
+
   async uninstall() {
     try {
-      this.showWelcome();
+      const { skillNames, options } = this.parseArgs();
+      const installed = this.getInstalledSkills();
 
-      const selectedSkills = await this.selectSkills();
+      if (installed.length === 0) {
+        console.log('\n❌ 没有已安装的技能\n');
+        return;
+      }
+
+      let selectedSkills = [];
+
+      // 卸载所有
+      if (options.all) {
+        selectedSkills = installed;
+      }
+      // 命令行指定技能
+      else if (skillNames.length > 0 && !options.interactive) {
+        const resolvedIds = skillNames.map(resolveSkillName);
+        const validIds = resolvedIds.filter(id => installed.includes(id));
+        const invalidNames = skillNames.filter((_, i) => !installed.includes(resolvedIds[i]));
+
+        if (invalidNames.length > 0) {
+          console.log('\n⚠️  以下技能未安装，已跳过:');
+          invalidNames.forEach(name => console.log(`   - ${name}`));
+        }
+
+        if (validIds.length === 0) {
+          console.log('\n❌ 没有有效的技能可卸载\n');
+          return;
+        }
+
+        selectedSkills = validIds;
+      }
+      // 交互式选择
+      else {
+        this.showWelcome();
+        selectedSkills = await this.selectSkills();
+      }
+
       if (selectedSkills.length === 0) {
         return;
       }
 
-      const confirmed = await this.confirmUninstallation(selectedSkills);
-      if (!confirmed) {
-        console.log('\n❌ 卸载已取消。');
-        return;
+      // 确认卸载（仅交互模式）
+      if (options.interactive || skillNames.length === 0) {
+        const confirmed = await this.confirmUninstallation(selectedSkills);
+        if (!confirmed) {
+          console.log('\n❌ 卸载已取消。\n');
+          return;
+        }
+      } else {
+        console.log('\n📋 即将卸载以下技能:\n');
+        selectedSkills.forEach(id => {
+          const skill = this.SKILLS_REGISTRY.find(s => s.id === id);
+          console.log(`  • ${skill?.name || id}`);
+        });
+        console.log();
+
+        const confirmed = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'confirm',
+            message: '确认卸载？',
+            default: false
+          }
+        ]);
+
+        if (!confirmed.confirm) {
+          console.log('\n❌ 卸载已取消\n');
+          return;
+        }
       }
 
       console.log('\n🔧 开始卸载...\n');
@@ -196,20 +320,32 @@ class SkillUninstaller {
         this.uninstallSkill(skillId);
       }
 
-      const installed = this.getInstalledSkills().filter(id => !selectedSkills.includes(id));
-      this.updateMarketplace(installed);
+      const remaining = installed.filter(id => !selectedSkills.includes(id));
+      this.updateMarketplace(remaining);
 
       console.log('\n✅ 卸载完成！');
       console.log('\n📝 提示:');
       console.log('  1. 请重新启动 Claude Code');
-      console.log('  2. 运行 "npm run list" 查看剩余技能\n');
+      console.log('  2. 运行 "dhf-skills list" 查看剩余技能\n');
 
     } catch (error) {
       console.error('\n❌ 卸载失败:', error.message);
+      if (process.env.DEBUG) {
+        console.error(error.stack);
+      }
       process.exit(1);
     }
   }
 }
 
-const uninstaller = new SkillUninstaller();
-uninstaller.uninstall();
+// 导出默认函数供 CLI 调用
+export default async function(args) {
+  const uninstaller = new SkillUninstaller(args);
+  await uninstaller.uninstall();
+}
+
+// 直接运行时
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const uninstaller = new SkillUninstaller(process.argv.slice(2));
+  uninstaller.uninstall();
+}

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
  * DHF RPA Skills 列表查看脚本
+ *
+ * 支持命令行参数
  */
 
 import fs from 'fs';
@@ -10,48 +12,25 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 技能注册表
-const SKILLS_REGISTRY = [
-  {
-    id: 'dhf-rpa-test-workflow',
-    name: 'RPA 测试工作流',
-    description: '测试 DHF Agent 基础连接和 RPA 操作',
-    category: '测试',
-    version: '1.0.0',
-    command: 'dhf-rpa-test-workflow'
-  },
-  {
-    id: 'dhf-rpa-163mail-task',
-    name: '163 邮件发送',
-    description: '自动化发送 163 邮件',
-    category: '邮件',
-    version: '1.0.0',
-    command: 'dhf-163mail-task'
-  },
-  {
-    id: 'dhf-rpa-outlook-mail-task',
-    name: 'Outlook 邮件发送',
-    description: '自动化发送 Outlook 邮件',
-    category: '邮件',
-    version: '1.0.0',
-    command: 'dhf-outlook-mail-task'
-  },
-  {
-    id: 'dhf-rpa-qq-mail-task',
-    name: 'QQ 邮件发送',
-    description: '自动化发送 QQ 邮件',
-    category: '邮件',
-    version: '1.0.0',
-    command: 'dhf-qq-mail-task'
+// 加载 skills.json 配置
+function loadSkillsConfig() {
+  const configPath = path.join(__dirname, '..', 'skills.json');
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    return Object.values(config.skills);
+  } catch (error) {
+    return [];
   }
-];
+}
 
 class SkillLister {
-  constructor() {
+  constructor(args = []) {
+    this.args = args;
     this.repoRoot = path.join(__dirname, '..');
     this.skillsDir = path.join(this.repoRoot, 'skills');
     this.pluginDir = path.join(this.repoRoot, '.claude-plugin');
     this.marketplaceFile = path.join(this.pluginDir, 'marketplace.json');
+    this.SKILLS_REGISTRY = loadSkillsConfig();
   }
 
   getInstalledSkills() {
@@ -69,21 +48,78 @@ class SkillLister {
   }
 
   getAvailableSkills() {
-    return SKILLS_REGISTRY.filter(skill => {
+    return this.SKILLS_REGISTRY.filter(skill => {
       const skillPath = path.join(this.skillsDir, skill.id);
       return fs.existsSync(skillPath);
     });
   }
 
-  displayTable() {
+  parseArgs() {
+    const options = {
+      installedOnly: false,
+      json: false,
+      category: null
+    };
+
+    for (const arg of this.args) {
+      if (arg === '--installed' || arg === '-i') {
+        options.installedOnly = true;
+      } else if (arg === '--json') {
+        options.json = true;
+      } else if (arg.startsWith('--category=')) {
+        options.category = arg.split('=')[1];
+      }
+    }
+
+    return options;
+  }
+
+  displayJson() {
     const installed = this.getInstalledSkills();
     const available = this.getAvailableSkills();
+
+    const data = {
+      available: available.length,
+      installed: installed.length,
+      skills: available.map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        description: skill.description,
+        category: skill.category,
+        version: skill.version,
+        command: skill.command,
+        installed: installed.includes(skill.id)
+      }))
+    };
+
+    console.log(JSON.stringify(data, null, 2));
+  }
+
+  displayTable() {
+    const options = this.parseArgs();
+    const installed = this.getInstalledSkills();
+    let available = this.getAvailableSkills();
+
+    // 筛选已安装
+    if (options.installedOnly) {
+      available = available.filter(skill => installed.includes(skill.id));
+    }
+
+    // 筛选分类
+    if (options.category) {
+      available = available.filter(skill => skill.category === options.category);
+    }
 
     console.log('\n╔══════════════════════════════════════════════════════════════╗');
     console.log('║          DHF RPA Skills - 技能列表                         ║');
     console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
-    console.log(`📦 可用技能: ${available.length} | ✅ 已安装: ${installed.length}\n`);
+    console.log(`📦 可用技能: ${this.getAvailableSkills().length} | ✅ 已安装: ${installed.length}\n`);
+
+    if (available.length === 0) {
+      console.log('   没有符合条件的技能\n');
+      return;
+    }
 
     const categories = {};
     available.forEach(skill => {
@@ -112,15 +148,49 @@ class SkillLister {
 
     console.log('\n' + '─'.repeat(70));
     console.log('\n💡 使用方法:');
-    console.log('  npm run install    - 安装新技能');
-    console.log('  npm run uninstall  - 卸载技能');
-    console.log('  npm run sync       - 同步已安装技能\n');
+    console.log('  dhf-skills list              - 查看所有技能');
+    console.log('  dhf-skills list --installed  - 查看已安装技能');
+    console.log('  dhf-skills install           - 交互式安装');
+    console.log('  dhf-skills install <skill>   - 安装指定技能');
+    console.log('  dhf-skills uninstall <skill> - 卸载技能\n');
+
+    // 显示快捷安装提示
+    if (!options.installedOnly) {
+      console.log('🚀 快捷安装示例:');
+      const examples = [
+        { name: 'QQ 邮件', id: 'qq-mail-task' },
+        { name: 'Google 搜索', id: 'google-search-task' },
+        { name: 'ChatGPT', id: 'chatgpt-ai-task' }
+      ];
+      examples.forEach(ex => {
+        const isInstalled = installed.includes(this.SKILLS_REGISTRY.find(s => s.id === ex.id)?.id);
+        if (!isInstalled) {
+          console.log(`  dhf-skills install ${ex.id}`);
+        }
+      });
+      console.log();
+    }
   }
 
   list() {
-    this.displayTable();
+    const options = this.parseArgs();
+
+    if (options.json) {
+      this.displayJson();
+    } else {
+      this.displayTable();
+    }
   }
 }
 
-const lister = new SkillLister();
-lister.list();
+// 导出默认函数供 CLI 调用
+export default function(args) {
+  const lister = new SkillLister(args);
+  lister.list();
+}
+
+// 直接运行时
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const lister = new SkillLister(process.argv.slice(2));
+  lister.list();
+}

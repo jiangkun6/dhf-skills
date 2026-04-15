@@ -1,0 +1,166 @@
+{
+  "version": "1.0.0",
+  "description": "DHF Agent RPA 自动化技能包配置",
+  "skills": {
+    "test-workflow": {
+      "id": "dhf-rpa-test-workflow",
+      "name": "RPA 测试工作流",
+      "description": "测试 DHF Agent 基础连接和 RPA 操作",
+      "category": "测试",
+      "version": "1.0.0",
+      "size": "2MB",
+      "tags": ["test", "workflow", "基础"],
+      "command": "dhf-rpa-test-workflow"
+    },
+    "qq-mail-task": {
+      "id": "dhf-rpa-qq-mail-task",
+      "name": "QQ 邮件发送",
+      "description": "自动化发送 QQ 邮件",
+      "category": "邮件",
+      "version": "1.0.0",
+      "size": "1.5MB",
+      "tags": ["mail", "qq", "email"],
+      "command": "dhf-qq-mail-task"
+    },
+    "outlook-mail-task": {
+      "id": "dhf-rpa-outlook-mail-task",
+      "name": "Outlook 邮件发送",
+      "description": "自动化发送 Outlook 邮件",
+      "category": "邮件",
+      "version": "1.0.0",
+      "size": "1.5MB",
+      "tags": ["mail", "outlook", "email"],
+      "command": "dhf-outlook-mail-task"
+    },
+    "mail-163-task": {
+      "id": "dhf-rpa-163mail-task",
+      "name": "163 邮件发送",
+      "description": "自动化发送 163 邮件",
+      "category": "邮件",
+      "version": "1.0.0",
+      "size": "1.5MB",
+      "tags": ["mail", "163", "email"],
+      "command": "dhf-163mail-task"
+    },
+    "google-search-task": {
+      "id": "google-search-task",
+      "name": "Google 搜索",
+      "description": "使用 Google 进行网络搜索",
+      "category": "搜索",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["search", "google"],
+      "command": "google-search-task"
+    },
+    "bing-search-task": {
+      "id": "bing-search-task",
+      "name": "Bing 搜索",
+      "description": "使用 Bing 进行网络搜索",
+      "category": "搜索",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["search", "bing"],
+      "command": "bing-search-task"
+    },
+    "duckduckgo-search-task": {
+      "id": "duckduckgo-search-task",
+      "name": "DuckDuckGo 搜索",
+      "description": "使用 DuckDuckGo 进行隐私搜索",
+      "category": "搜索",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["search", "duckduckgo", "privacy"],
+      "command": "duckduckgo-search-task"
+    },
+    "naver-search-task": {
+      "id": "naver-search-task",
+      "name": "Naver 搜索",
+      "description": "使用 Naver 进行韩语搜索",
+      "category": "搜索",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["search", "naver", "korean"],
+      "command": "naver-search-task"
+    },
+    "sogou-wechat-search-task": {
+      "id": "sogou-wechat-search-task",
+      "name": "搜狗微信搜索",
+      "description": "搜索微信公众号文章",
+      "category": "搜索",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["search", "sogou", "wechat", "weixin"],
+      "command": "sogou-wechat-search-task"
+    },
+    "yahoo-japan-search-task": {
+      "id": "yahoo-japan-search-task",
+      "name": "Yahoo 日本搜索",
+      "description": "使用 Yahoo Japan 进行日语搜索",
+      "category": "搜索",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["search", "yahoo", "japanese"],
+      "command": "yahoo-japan-search-task"
+    },
+    "chatgpt-ai-task": {
+      "id": "chatgpt-ai-task",
+      "name": "ChatGPT AI",
+      "description": "使用 ChatGPT 进行 AI 对话",
+      "category": "AI 任务",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["ai", "chatgpt", "openai"],
+      "command": "chatgpt-ai-task"
+    },
+    "claude-ai-task": {
+      "id": "claude-ai-task",
+      "name": "Claude AI",
+      "description": "使用 Claude 进行 AI 对话",
+      "category": "AI 任务",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["ai", "claude", "anthropic"],
+      "command": "claude-ai-task"
+    },
+    "deepseek-ai-task": {
+      "id": "deepseek-ai-task",
+      "name": "DeepSeek AI",
+      "description": "使用 DeepSeek 进行 AI 对话",
+      "category": "AI 任务",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["ai", "deepseek"],
+      "command": "deepseek-ai-task"
+    },
+    "gemini-ai-task": {
+      "id": "gemini-ai-task",
+      "name": "Gemini AI",
+      "description": "使用 Google Gemini 进行 AI 对话",
+      "category": "AI 任务",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["ai", "gemini", "google"],
+      "command": "gemini-ai-task"
+    },
+    "kimi-ai-task": {
+      "id": "kimi-ai-task",
+      "name": "Kimi AI",
+      "description": "使用 Moonshot Kimi 进行 AI 对话",
+      "category": "AI 任务",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["ai", "kimi", "moonshot"],
+      "command": "kimi-ai-task"
+    },
+    "qwen-ai-task": {
+      "id": "qwen-ai-task",
+      "name": "通义千问 AI",
+      "description": "使用阿里云通义千问进行 AI 对话",
+      "category": "AI 任务",
+      "version": "1.0.0",
+      "size": "1MB",
+      "tags": ["ai", "qwen", "alibaba"],
+      "command": "qwen-ai-task"
+    }
+  }
+}
