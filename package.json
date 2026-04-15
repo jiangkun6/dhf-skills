@@ -8,7 +8,6 @@
     "dhf-skills": "./bin/dhf-skills.js"
   },
   "scripts": {
-    "postinstall": "node scripts/install.js --check",
     "install": "node scripts/install.js",
     "install:batch": "node scripts/install.js --batch",
     "uninstall": "node scripts/uninstall.js",
@@ -64,11 +63,11 @@
     "node": ">=18.0.0"
   },
   "files": [
+    "bin/",
     "scripts/",
     "skills/",
-    "packages/",
+    "skills.json",
     "README.md",
-    "LICENSE",
-    "INSTALL.md"
+    "LICENSE"
   ]
 }
