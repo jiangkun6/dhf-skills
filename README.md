@@ -68,7 +68,7 @@
 
 ```bash
 # 全局安装
-npm install -g @dhf-skill/dhf-skills
+npm install -g @jiangkun6/dhf-skills
 
 # 查看所有可用技能
 dhf-skills list
